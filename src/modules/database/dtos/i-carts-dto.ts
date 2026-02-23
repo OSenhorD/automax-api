@@ -16,9 +16,19 @@ export type ICartListControllerRes = ICart;
 export type ICartGetControllerParam = ICart;
 export type ICartGetUseCaseParam = ICart;
 export type ICartGetRepositoryParam = ICart;
-export type ICartGetRepositoryRes = ICart;
-export type ICartGetUseCaseRes = ICart;
-export type ICartGetControllerRes = ICart;
+export type ICartGetRepositoryRes = {
+  id: number;
+  userId: number;
+  products: {
+    id: number;
+    productId: number;
+    quantity: number;
+  }[];
+  createdAt: Date;
+  totalQuantity: number;
+};
+export type ICartGetUseCaseRes = ICartGetRepositoryRes;
+export type ICartGetControllerRes = ICartGetUseCaseRes;
 
 export type ICartCreateControllerParam = {
   id: number;

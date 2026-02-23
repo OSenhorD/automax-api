@@ -8,13 +8,13 @@ export class CartProduct {
   @PrimaryColumn({ generated: 'increment' })
   id: number;
 
-  @ManyToOne(() => Cart, { nullable: false, eager: true })
-  @JoinColumn({ name: 'cart_id', referencedColumnName: 'id' })
-  cartId: number;
+  @ManyToOne(() => Cart, (cart) => cart.items, { cascade: true })
+  @JoinColumn({ name: 'cart_id' })
+  cart: Cart;
 
-  @ManyToOne(() => Product, { nullable: false, eager: true })
-  @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
-  productId: number;
+  @ManyToOne(() => Product)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 
   @Column({ name: 'quantity' })
   quantity: number;

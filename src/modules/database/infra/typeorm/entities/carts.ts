@@ -1,6 +1,7 @@
-import { PrimaryColumn, Entity, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { PrimaryColumn, Entity, CreateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 import { User } from '@/modules/database/infra/typeorm/entities/users';
+import { CartProduct } from '@/modules/database/infra/typeorm/entities/cart_products';
 
 @Entity('carts')
 export class Cart {
@@ -8,9 +9,12 @@ export class Cart {
   id: number;
 
   @ManyToOne(() => User, { nullable: false, eager: true })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  userId: number;
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
-  @CreateDateColumn({ name: 'created_at', select: false })
+  @OneToMany(() => CartProduct, (cartProduct) => cartProduct.cart)
+  items: CartProduct[];
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
 }

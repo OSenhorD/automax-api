@@ -74,20 +74,25 @@ export class CartRepository implements ICartRepository {
 
   get = async (id: number): Promise<HttpResponse<ICartGetRepositoryRes>> => {
     try {
-      let query = this._repository
-        .createQueryBuilder('cart')
-        .select([
-          `cart.id as "id"`,
-          `cart.userId as "userId"`,
-          `cart.createdAt as "createdAt"`,
-          //
-        ])
-        .where('cart.id = :id', { id });
+      const items = await this._repository.find({
+        where: { id },
+        relations: { user: true, items: true },
+      });
+      if (typeof items === 'undefined' || items.length === 0) return noContent();
 
-      const item = await query.getRawOne();
-      if (typeof item === 'undefined') return noContent();
-
-      return ok(item);
+      const item = items[0];
+      const data = {
+        id: item.id,
+        userId: item.user?.id,
+        products: item.items.map((i) => ({
+          id: i.id,
+          productId: i.product?.id,
+          quantity: i.quantity,
+        })),
+        createdAt: item.createdAt,
+        totalQuantity: item.items.map((i) => i.quantity).reduce((a, b) => a + b, 0),
+      };
+      return ok(data);
     } catch (error) {
       return serverError(error, 'CartRepository get');
     }
@@ -107,26 +112,41 @@ export class CartRepository implements ICartRepository {
     }
   };
 
-  create = async (item: ICartCreateRepositoryParam): Promise<HttpResponse> => {
+  create = async (body: ICartCreateRepositoryParam): Promise<HttpResponse> => {
     try {
       await AppDataSource.transaction(async (trx) => {
         const cart = trx.getRepository(Cart);
         const cartProduct = trx.getRepository(CartProduct);
 
-        const result = await cart.save(
+        const newItem = await cart.save(
           cart.create({
-            id: item.id,
-            userId: item.userId,
+            id: body.id,
+            user: { id: body.userId },
           })
         );
 
-        const products = item.products.map((prod) => ({
-          ...prod,
-          cartId: result.id,
-        }));
-
-        await cartProduct.save(cartProduct.create(products));
+        await cartProduct.save(
+          cartProduct.create(
+            body.products.map((p) => ({
+              cart: { id: newItem.id },
+              quantity: p.quantity,
+              product: { id: p.productId },
+            }))
+          )
+        );
       });
+
+      /*
+      const newItem = this._repository.create({
+        id: body.id,
+        user: { id: body.userId },
+        items: body.products.map((p) => ({
+          quantity: p.quantity,
+          productId: p.productId,
+        })),
+      });
+      await this._repository.save(newItem);
+      */
 
       return ok();
     } catch (error) {
