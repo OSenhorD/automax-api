@@ -6,7 +6,13 @@ export class CreateUsers1677089029030 implements MigrationInterface {
       new Table({
         name: 'users',
         columns: [
-          { name: 'id', type: 'incremental', isPrimary: true },
+          {
+            name: 'id',
+            type: 'integer',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+          },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
           { name: 'updated_at', type: 'timestamp', default: 'now()' },
         ],
