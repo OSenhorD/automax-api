@@ -6,6 +6,10 @@ import * as express from 'express';
 
 import '@/shared/container';
 
+import { startConnection } from '@/shared/infra/typeorm';
+
+startConnection();
+
 const app = express();
 
 app.use(express.json());

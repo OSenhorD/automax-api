@@ -16,6 +16,6 @@ export class CronSyncCartsUseCase {
     //   return result;
     // }
 
-    // return result;
+    return { data: 0 };
   };
 }
