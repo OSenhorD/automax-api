@@ -1,0 +1,14 @@
+node_modules
+build
+dist
+tmp
+
+npm-debug.log
+.env
+*.tar
+*.zip
+*.log
+*.Identifier
+.vercel
+
+*.pdf
