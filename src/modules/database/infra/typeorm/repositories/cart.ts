@@ -42,19 +42,23 @@ export class CartRepository implements ICartRepository {
     const validParams = getValidParams(params);
 
     try {
-      let query = this._repository.createQueryBuilder('cart').select([
-        `cart.id as "id"`,
-        `cart.userId as "userId"`,
-        `cart.createdAt as "createdAt"`,
-        //
-      ]);
+      let query = this._repository
+        .createQueryBuilder('cart')
+        .select([
+          `cart.id as "id"`,
+          `cart.user.id as "userId"`,
+          'COALESCE(SUM(cartProduct.quantity), 0) as totalQuantity',
+          `cart.createdAt as "createdAt"`,
+        ])
+        .leftJoin('cart.items', 'cartProduct')
+        .groupBy('cart.id');
 
       query = insertWhereParams(query, validParams);
 
       if (search) {
         query = query.andWhere(
           new Brackets((qb) => {
-            qb.where('CAST(cart.userId AS VARCHAR) ilike :search', { search: `%${search}%` });
+            qb.where('CAST(cart.user.id AS VARCHAR) ilike :search', { search: `%${search}%` });
           })
         );
       }
