@@ -93,6 +93,10 @@ export class CartRepository implements ICartRepository {
     }
   };
 
+  has = async (id: number): Promise<boolean> => {
+    return await this._repository.existsBy({ id });
+  };
+
   delete = async (id: number): Promise<HttpResponse> => {
     try {
       await this._repository.delete(id);

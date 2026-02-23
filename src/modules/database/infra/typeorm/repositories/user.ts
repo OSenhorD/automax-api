@@ -34,6 +34,10 @@ export class UserRepository implements IUserRepository {
     }
   };
 
+  has = async (id: number): Promise<boolean> => {
+    return await this._repository.existsBy({ id });
+  };
+
   create = async (
     item: IUserCreateRepositoryParam
   ): Promise<HttpResponse<IUserCreateRepositoryRes>> => {

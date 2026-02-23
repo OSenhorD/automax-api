@@ -8,6 +8,7 @@ import { HttpResponse } from '@/shared/helpers';
 
 export interface IProductRepository {
   get(id: number): Promise<HttpResponse<IProductGetRepositoryRes>>;
+  has(id: number): Promise<boolean>;
 
   create(item: IProductCreateRepositoryParam): Promise<HttpResponse<IProductCreateRepositoryRes>>;
 }

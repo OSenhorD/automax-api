@@ -31,8 +31,8 @@ export class CronSyncCartsUseCase {
     // Cria os usuários
     const uniqueUserIds = [...new Set(result.map((item) => item.userId))];
     for await (const userId of uniqueUserIds) {
-      const item = await this._userRepository.get(userId);
-      if (item.data?.id) continue;
+      const has = await this._userRepository.has(userId);
+      if (has) continue;
 
       await this._userRepository.create({
         id: userId,
@@ -44,8 +44,8 @@ export class CronSyncCartsUseCase {
       ...new Set(result.flatMap((item) => item.products.map((p) => p.productId))),
     ];
     for await (const productId of uniqueProductIds) {
-      const item = await this._productRepository.get(productId);
-      if (item.data?.id) continue;
+      const has = await this._productRepository.has(productId);
+      if (has) continue;
 
       await this._productRepository.create({
         id: productId,
@@ -53,8 +53,8 @@ export class CronSyncCartsUseCase {
     }
 
     for await (const cart of result) {
-      const item = await this._cartRepository.get(cart.id);
-      if (item.data?.id) {
+      const has = await this._cartRepository.has(cart.id);
+      if (has) {
         await this._cartRepository.delete(cart.id);
       }
 

@@ -34,6 +34,10 @@ export class ProductRepository implements IProductRepository {
     }
   };
 
+  has = async (id: number): Promise<boolean> => {
+    return await this._repository.existsBy({ id });
+  };
+
   create = async (
     item: IProductCreateRepositoryParam
   ): Promise<HttpResponse<IProductCreateRepositoryRes>> => {
