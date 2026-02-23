@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 
-import { FakeStoreApiProvider } from '@/shared/container/providers/fakestoreapi-provider/implementations/fakestoreapi.provider';
+import { FakeStoreApiProvider } from '@/shared/container/providers/storeapi-provider/implementations/fakestoreapi.provider';
 
 type StoreCartProducts = {
   productId: number;
@@ -28,4 +28,4 @@ const providers = {
 
 const provider = (process.env.PROVIDER_STORE_API || 'fakestoreapi') as keyof Provider;
 
-container.registerInstance<IStoreProvider>('fakestoreapi', providers[provider]);
+container.registerInstance<IStoreProvider>('IStoreApiProvider', providers[provider]);

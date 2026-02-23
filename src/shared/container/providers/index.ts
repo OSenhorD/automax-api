@@ -1,1 +1,1 @@
-import './fakestoreapi-provider';
+import './storeapi-provider';

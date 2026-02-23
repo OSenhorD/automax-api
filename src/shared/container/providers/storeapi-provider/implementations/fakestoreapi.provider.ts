@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { StoreCarts, IStoreProvider } from '@/shared/container/providers/fakestoreapi-provider';
+import { StoreCarts, IStoreProvider } from '@/shared/container/providers/storeapi-provider';
 
 type FakeStoreApiCartProducts = {
   productId: number;
