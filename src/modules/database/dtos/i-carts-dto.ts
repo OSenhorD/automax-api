@@ -1,6 +1,9 @@
+import { ICartProduct } from '@/modules/database/dtos/i-cart-products-dto';
+
 export interface ICart {
   id: number;
   userId: number;
+  products: ICartProduct[];
 }
 
 export type ICartListControllerParam = ICart;
@@ -17,9 +20,13 @@ export type ICartGetRepositoryRes = ICart;
 export type ICartGetUseCaseRes = ICart;
 export type ICartGetControllerRes = ICart;
 
-export type ICartCreateControllerParam = ICart;
-export type ICartCreateUseCaseParam = ICart;
-export type ICartCreateRepositoryParam = ICart;
+export type ICartCreateControllerParam = {
+  id: number;
+  userId: number;
+  products: Omit<ICartProduct, 'id' | 'cartId'>[];
+};
+export type ICartCreateUseCaseParam = ICartCreateControllerParam;
+export type ICartCreateRepositoryParam = ICartCreateUseCaseParam;
 export type ICartCreateRepositoryRes = ICart;
 export type ICartCreateUseCaseRes = ICart;
 export type ICartCreateControllerRes = ICart;

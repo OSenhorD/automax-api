@@ -12,6 +12,7 @@ import { ISearch } from '@/interfaces/shared';
 export interface ICartRepository {
   list(data: ISearch): Promise<HttpResponseList<ICartListRepositoryRes[]>>;
   get(id: number): Promise<HttpResponse<ICartGetRepositoryRes>>;
+  delete(id: number): Promise<HttpResponse>;
 
   create(item: ICartCreateRepositoryParam): Promise<HttpResponse<ICartCreateRepositoryRes>>;
 }

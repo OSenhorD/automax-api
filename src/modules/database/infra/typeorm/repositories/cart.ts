@@ -6,7 +6,6 @@ import {
   ICartListRepositoryRes,
   ICartGetRepositoryRes,
   ICartCreateRepositoryParam,
-  ICartCreateRepositoryRes,
 } from '@/modules/database/dtos/i-carts-dto';
 
 import { ICartRepository } from '@/modules/database/repositories/i-cart';
@@ -28,6 +27,8 @@ import { getValidParams } from '@/utils/utils';
 import { insertWhereParams } from '@/utils/typeorm-utils';
 
 import { ISearch } from '@/interfaces/shared';
+
+import { CartProduct } from '@/modules/database/infra/typeorm/entities/cart_products';
 
 export class CartRepository implements ICartRepository {
   private readonly _repository = AppDataSource.getRepository(Cart);
@@ -92,18 +93,38 @@ export class CartRepository implements ICartRepository {
     }
   };
 
-  create = async (
-    item: ICartCreateRepositoryParam
-  ): Promise<HttpResponse<ICartCreateRepositoryRes>> => {
+  delete = async (id: number): Promise<HttpResponse> => {
     try {
-      const newItem = this._repository.create({
-        id: item?.id,
-        userId: item?.userId,
+      await this._repository.delete(id);
+
+      return ok();
+    } catch (error) {
+      return serverError(error, 'CartRepository delete');
+    }
+  };
+
+  create = async (item: ICartCreateRepositoryParam): Promise<HttpResponse> => {
+    try {
+      await AppDataSource.transaction(async (trx) => {
+        const cart = trx.getRepository(Cart);
+        const cartProduct = trx.getRepository(CartProduct);
+
+        const result = await cart.save(
+          cart.create({
+            id: item.id,
+            userId: item.userId,
+          })
+        );
+
+        const products = item.products.map((prod) => ({
+          ...prod,
+          cartId: result.id,
+        }));
+
+        await cartProduct.save(cartProduct.create(products));
       });
 
-      const result = await this._repository.save(newItem);
-
-      return ok(result);
+      return ok();
     } catch (error) {
       return serverError(error, 'CartRepository create');
     }

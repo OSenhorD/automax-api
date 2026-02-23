@@ -6,6 +6,9 @@ import { IStoreProvider } from '@/shared/container/providers/storeapi-provider';
 
 import { IUserRepository } from '@/modules/database/repositories/i-user';
 import { IProductRepository } from '@/modules/database/repositories/i-product';
+import { ICartRepository } from '@/modules/database/repositories/i-cart';
+
+import { CartCreateController } from '@/modules/database/use-cases/cart/create-controller';
 
 @injectable()
 export class CronSyncCartsUseCase {
@@ -14,6 +17,8 @@ export class CronSyncCartsUseCase {
     private readonly _userRepository: IUserRepository,
     @inject('ProductRepository')
     private readonly _productRepository: IProductRepository,
+    @inject('CartRepository')
+    private readonly _cartRepository: ICartRepository,
     @inject('IStoreApiProvider')
     private readonly _store: IStoreProvider
   ) {}
@@ -44,6 +49,19 @@ export class CronSyncCartsUseCase {
 
       await this._productRepository.create({
         id: productId,
+      });
+    }
+
+    for await (const cart of result) {
+      const item = await this._cartRepository.get(cart.id);
+      if (item.data?.id) {
+        await this._cartRepository.delete(cart.id);
+      }
+
+      await new CartCreateController().handle({
+        id: cart.id,
+        userId: cart.userId,
+        products: cart.products,
       });
     }
 
