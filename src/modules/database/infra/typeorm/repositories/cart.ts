@@ -22,10 +22,6 @@ import {
   HttpResponseList,
 } from '@/shared/helpers';
 
-import { getValidParams } from '@/utils/utils';
-
-import { insertWhereParams } from '@/utils/typeorm-utils';
-
 import { ISearch } from '@/interfaces/shared';
 
 import { CartProduct } from '@/modules/database/infra/typeorm/entities/cart_products';
@@ -39,8 +35,6 @@ export class CartRepository implements ICartRepository {
     pageSize,
     params,
   }: ISearch): Promise<HttpResponseList<ICartListRepositoryRes[]>> => {
-    const validParams = getValidParams(params);
-
     try {
       let query = this._repository
         .createQueryBuilder('cart')
@@ -53,12 +47,12 @@ export class CartRepository implements ICartRepository {
         .leftJoin('cart.items', 'cartProduct')
         .groupBy('cart.id');
 
-      query = insertWhereParams(query, validParams);
-
       if (search) {
         query = query.andWhere(
           new Brackets((qb) => {
-            qb.where('CAST(cart.user.id AS VARCHAR) ilike :search', { search: `%${search}%` });
+            qb.where('CAST(LOWER(cart.user.id) AS VARCHAR) like :search', {
+              search: `%${search.toLowerCase()}%`,
+            });
           })
         );
       }
