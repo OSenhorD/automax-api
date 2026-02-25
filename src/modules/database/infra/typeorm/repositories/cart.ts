@@ -74,7 +74,12 @@ export class CartRepository implements ICartRepository {
     try {
       const items = await this._repository.find({
         where: { id },
-        relations: { user: true, items: true },
+        relations: {
+          user: true,
+          items: {
+            product: true,
+          },
+        },
       });
       if (typeof items === 'undefined' || items.length === 0) return noContent();
 
